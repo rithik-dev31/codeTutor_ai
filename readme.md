@@ -145,7 +145,7 @@ codeTutor/                              # Root Directory
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/codeTutor_ai.git
+git clone https://github.com/rithik-dev31/codeTutor_ai.git
 cd codeTutor_ai
 
 # 2. Create virtual environment
@@ -430,9 +430,9 @@ This project is dedicated to **every beginner programmer** who's ever been frust
 <div align="center">
   <h3>📧 Contact & Support</h3>
   <p>
-    <strong>Developer:</strong> Your Name<br>
-    <strong>Email:</strong> your.email@example.com<br>
-    <strong>GitHub:</strong> <a href="https://github.com/your-username">@your-username</a>
+    <strong>Developer:</strong>RITHIK<br>
+    <strong>Email:</strong> rithik.devpro@gmail.com<br>
+    <strong>GitHub:</strong> <a href="https://github.com/rithik-dev31">@rithik-dev31</a>
   </p>
   
   <p>
