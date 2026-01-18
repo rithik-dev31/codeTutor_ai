@@ -121,7 +121,8 @@ codeTutor/                              # Root Directory
 ├── manage.py                           # Django management script
 ├── .env                                # Environment variables (template)
 ├── .gitignore                          # Git exclusion rules
-└── README.md                           # This documentation
+├── README.md                           # This documentation
+└── Licence                             # MitLicence
 ```
 
 ### **Key Technical Decisions**
