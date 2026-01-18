@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeTutor AI - Smart Error Detection & Learning Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #1e293b;
+            padding: 15px 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: auto;
+            min-height: 70px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .logo-text p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin: 2px 0 0 0;
+            line-height: 1.2;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .lang-btn {
+            background: #334155;
+            color: #94a3b8;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: #475569;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: calc(100vh - 80px);
+            gap: 0;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .panel:first-child {
+            border-right: 1px solid #334155;
+        }
+
+        .panel-header {
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .code-editor-container {
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .editor-header {
+            background: #1e293b;
+            padding: 10px 15px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-info {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .code-input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+            background: #0f172a;
+        }
+
+        .line-counter {
+            position: sticky;
+            left: 0;
+            top: 0;
+            width: 50px;
+            background: #0f172a;
+            color: #64748b;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            text-align: right;
+            padding: 15px 8px;
+            line-height: 1.5;
+            user-select: none;
+            border-right: 1px solid #334155;
+            z-index: 1;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .code-editor {
+            background: #0f172a;
+            color: #e2e8f0;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            flex: 1;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+            overflow-y: auto;
+            min-height: 100%;
+            width: 100%;
+            tab-size: 4;
+        }
+
+        .code-editor::placeholder {
+            color: #475569;
+        }
+
+        .code-stats {
+            background: #1e293b;
+            padding: 8px 15px;
+            border-top: 1px solid #334155;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: right;
+        }
+
+        .analysis-container {
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            max-height: max-content;
+            /* overflow: hidden; */
+        }
+
+        .empty-analysis {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 15px;
+            color: #64748b;
+            flex: 1;
+        }
+
+        .empty-analysis i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-analysis h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        .empty-analysis p {
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .analysis-results {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .analysis-results.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 15px;
+            flex: 1;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+            border: 3px solid #334155;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        /* Concept Map Styles */
+        .concept-map {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #334155;
+        }
+
+        .concept-map h3 {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .concept-map h3 i {
+            color: #667eea;
+        }
+
+        .concept-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .concept-category {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .category-header {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .concept-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .concept-badge {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .concept-badge:hover {
+            background: #334155;
+            border-color: #475569;
+        }
+
+        .concept-badge.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+
+        .concept-count {
+            background: #1e293b;
+            color: #94a3b8;
+            border-radius: 8px;
+            padding: 2px 5px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .concept-badge.active .concept-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .issue-item {
+            background: #1e293b;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid #334155;
+            transition: all 0.3s;
+        }
+
+        .issue-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .issue-item.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .issue-item.filtered {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .issue-badges {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .issue-type {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .issue-type.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .issue-type.warning {
+            background: #78350f;
+            color: #fcd34d;
+        }
+
+        .issue-severity {
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .severity-critical {
+            background: #7f1d1d;
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+        }
+
+        .severity-high {
+            background: #7c2d12;
+            color: #fdba74;
+            border: 1px solid #ea580c;
+        }
+
+        .severity-medium {
+            background: #854d0e;
+            color: #fde047;
+            border: 1px solid #ca8a04;
+        }
+
+        .severity-low {
+            background: #365314;
+            color: #bef264;
+            border: 1px solid #65a30d;
+        }
+
+        .issue-description {
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+
+        .issue-details {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #334155;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-label {
+            color: #64748b;
+            min-width: 70px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #e2e8f0;
+            flex: 1;
+        }
+
+        .issue-code {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            margin-bottom: 10px;
+            border: 1px solid #334155;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .issue-line {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Hint System Styles */
+        .hint-system {
+            margin-top: 12px;
+            border-top: 1px solid #334155;
+            padding-top: 12px;
+        }
+
+        .hint-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .hint-header i {
+            color: #667eea;
+        }
+
+        .hint-levels {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hint-btn {
+            flex: 1;
+            padding: 7px 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #94a3b8;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .hint-btn:hover:not(:disabled) {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .hint-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+        }
+
+        .hint-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hint-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Correction Strategies */
+        .correction-strategies {
+            margin-top: 15px;
+        }
+
+        .strategies-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .strategy-item {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #334155;
+        }
+
+        .strategy-name {
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .strategy-description {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .strategy-code {
+            background: #0f172a;
+            border-radius: 6px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #e2e8f0;
+            margin-bottom: 10px;
+            border: 1px solid #334155;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .pros-list, .cons-list {
+            font-size: 0.75rem;
+        }
+
+        .pros-title, .cons-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pros-title {
+            color: #10b981;
+        }
+
+        .cons-title {
+            color: #ef4444;
+        }
+
+        .pros-list ul, .cons-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .pros-list li, .cons-list li {
+            padding: 3px 0;
+            padding-left: 18px;
+            position: relative;
+            color: #94a3b8;
+        }
+
+        .pros-list li:before {
+            content: "✓";
+            color: #10b981;
+            position: absolute;
+            left: 0;
+        }
+
+        .cons-list li:before {
+            content: "✗";
+            color: #ef4444;
+            position: absolute;
+            left: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .suggestion {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .suggestion-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-content {
+            color: #cbd5e1;
+            line-height: 1.5;
+            font-size: 0.85rem;
+        }
+
+        .corrected-code-section {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(21, 128, 61, 0.1) 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .corrected-code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: #22c55e;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .code-block {
+            background: #0f172a;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            border: 1px solid #334155;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .copy-btn {
+            background: #334155;
+            color: #e2e8f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #475569;
+        }
+
+        .summary-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .summary-badge.success {
+            background: #166534;
+            color: #86efac;
+        }
+
+        .summary-badge.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .summary-badge.warning {
+            background: #78350f;
+            color: #fcd34d;
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #334155;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .analysis-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .analysis-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .issues-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #334155;
+            color: #94a3b8;
+            border: 1px solid #475569;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: transparent;
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: #475569;
+        }
+
+        /* Mobile Responsive */
+        /* REPLACE THESE MEDIA QUERY SECTIONS */
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: calc(100vh - 80px);
+    }
+    
+    .panel:first-child {
+        border-right: none;
+        border-bottom: 1px solid #334155;
+        /* REMOVE THIS: height: 50vh; */
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .panel {
+        /* REMOVE THIS: height: 50vh; */
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .pros-cons {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        padding: 12px 15px;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.1rem;
+    }
+    
+    .logo-text p {
+        font-size: 0.7rem;
+    }
+    
+    /* ADD THIS to ensure results container is visible */
+    .analysis-results.active {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: visible;
+    }
+    
+    .issues-container {
+        flex: 1;
+        overflow: visible;
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        height: auto;
+        padding: 10px;
+    }
+    
+    .logo {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .language-selector {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .main-content {
+        height: auto;
+    }
+    
+    .panel {
+        padding: 15px;
+        /* REMOVE THIS: height: 50vh; */
+        height: auto;
+        min-height: 350px;
+    }
+    
+    .panel:first-child {
+        /* REMOVE THIS: height: 60vh; */
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .btn {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .hint-levels {
+        flex-direction: column;
+    }
+    
+    .hint-btn {
+        min-width: 100%;
+    }
+    
+    .issue-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .issue-badges {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    /* FIX FOR ANALYSIS CONTAINER */
+    .analysis-container {
+        max-height: none !important;
+        overflow: visible !important;
+        flex: 1;
+    }
+    
+    /* ENSURE ALL CONTENT IS VISIBLE */
+    .concept-map,
+    .filter-controls,
+    .issues-container,
+    .issue-item,
+    .correction-strategies,
+    .suggestion,
+    .corrected-code-section {
+        opacity: 1 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Ensure filtered items are properly hidden on mobile */
+    .issue-item.filtered {
+        display: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .panel {
+        padding: 10px;
+        min-height: 300px;
+    }
+    
+    .panel:first-child {
+        min-height: 350px;
+    }
+    
+    .concept-category {
+        min-width: 100%;
+    }
+    
+    .analysis-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .analysis-meta {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-controls {
+        flex-direction: row; /* Changed from column */
+        gap: 6px;
+    }
+    
+    .filter-btn {
+        flex: 1;
+        min-width: auto;
+        text-align: center;
+        /* REMOVE THIS: width: 100%; */
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    /* Ensure concept map is visible */
+    .concept-categories {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .concept-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    /* Fix for hint buttons */
+    .hint-levels {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .hint-btn {
+        width: 100%;
+    }
+    
+    /* Make sure all content is visible */
+    .analysis-results.active {
+        display: flex !important;
+        flex-direction: column;
+        flex: 1;
+        overflow: visible;
+    }
+}
+
+/* ADD THESE FIXES AT THE BOTTOM OF THE CSS */
+
+/* Fix for overflow issues */
+.analysis-results.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* Ensure issues container is always visible */
+.issues-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    min-height: 500px;
+}
+
+/* Fix for filtered items on all screen sizes */
+.issue-item.filtered {
+    display: none !important;
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Make sure filter buttons are always visible */
+.filter-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix for concept map visibility */
+.concept-map {
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #334155;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix for panels on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .panel {
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
+    }
+    
+    .code-editor-container {
+        min-height: 300px;
+    }
+    
+    .analysis-container {
+        min-height: 300px;
+    }
+    
+    /* Make touch targets larger */
+    .filter-btn,
+    .hint-btn,
+    .concept-badge,
+    .btn {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+}
+
+/* Fix for very small screens */
+@media (max-width: 320px) {
+    .filter-controls {
+        flex-direction: column;
+    }
+    
+    .filter-btn {
+        width: 100%;
+    }
+    
+    .concept-badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+    
+    .issue-badges {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+        /* Ensure issues container handles hidden items properly */
+        .issues-container {
+            transition: all 0.3s ease;
+        }
+
+        /* Smooth transitions for showing/hiding */
+        .issue-item {
+            transition: all 0.3s ease;
+        }
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Fix for line counter alignment */
+        .code-input-wrapper {
+            position: relative;
+            overflow: auto;
+        }
+
+        .line-counter, .code-editor {
+            line-height: 1.5;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            height: 100%;
+        }
+
+        .code-editor {
+            padding-left: 10px;
+            padding-right: 15px;
+        }
+
+        /* Fix for text selection */
+        .code-editor::selection {
+            background: rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="logo-text">
+                <h1>CodeTutor AI</h1>
+                <p>Smart Error Detection & Learning Platform</p>
+            </div>
+        </div>
+        <div class="language-selector">
+            <button class="lang-btn active" data-lang="python">Python</button>
+            <button class="lang-btn" data-lang="javascript">JavaScript</button>
+            <button class="lang-btn" data-lang="java">Java</button>
+            <button class="lang-btn" data-lang="cpp">C++</button>
+            <button class="lang-btn" data-lang="csharp">C#</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Left Panel: Code Editor -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">CODE EDITOR</div>
+            </div>
+
+            <div class="code-editor-container">
+                <div class="editor-header">
+                    <div class="editor-info">
+                        <span id="fileName"><span id="currentLanguage">Python</span> Code</span>
+                    </div>
+                </div>
+                
+                <div class="code-input-wrapper">
+                    <div class="line-counter" id="lineCounter">1</div>
+                    <textarea 
+                        class="code-editor" 
+                        id="codeInput" 
+                        spellcheck="false"
+                        placeholder="Write or paste code to begin analysis"># Python Example with intentional errors  
+def greet(name)  
+   print "Hello, " + name  
+
+x =  
+if x > 5  
+   print("x is greater than 5")  
+
+for i in range(10):  
+   print(i)  # inconsistent indentation  
+   print(i * 2)</textarea>
+                </div>
+                
+                <div class="code-stats">
+                    <span id="lineCount">12</span> lines
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="analyzeBtn">
+                    <i class="fas fa-magic"></i>
+                    Analyze Code
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    <i class="fas fa-eraser"></i>
+                    Clear Code
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Panel: Analysis Results -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">AI ANALYSIS</div>
+            </div>
+
+            <div class="analysis-container">
+                <!-- Empty State -->
+                <div class="empty-analysis" id="emptyState">
+                    <i class="fas fa-code-branch"></i>
+                    <h3>Write or paste code to begin analysis</h3>
+                    <p>Your code analysis results will appear here</p>
+                </div>
+
+                <!-- Loading State -->
+                <div class="loading" id="loadingState">
+                    <div class="spinner"></div>
+                    <p>Analyzing your code with AI...</p>
+                </div>
+
+                <!-- Results Container -->
+                <div class="analysis-results" id="resultsContainer">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div><script>
+    const codeInput = document.getElementById('codeInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const lineCount = document.getElementById('lineCount');
+    const lineCounter = document.getElementById('lineCounter');
+    const emptyState = document.getElementById('emptyState');
+    const loadingState = document.getElementById('loadingState');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const currentLanguage = document.getElementById('currentLanguage');
+    const langButtons = document.querySelectorAll('.lang-btn');
+
+    let currentLang = 'python';
+    let currentAnalysis = null;
+    let activeFilter = 'all';
+    let activeHintLevels = {};
+
+    const exampleCode = {
+        python: `# Python Example with intentional errors  
+def greet(name)  
+   print "Hello, " + name  
+
+x =  
+if x > 5  
+   print("x is greater than 5")  
+
+for i in range(10):  
+   print(i)  # inconsistent indentation  
+   print(i * 2)`,
+        
+        javascript: `// JavaScript Example with errors
+function calculateSum(a, b {
+    return a + b
+}
+
+let x =
+if (x > 5) {
+    console.log("x is greater than 5"
+}
+
+for (let i = 0; i < 10; i++ {
+    console.log(i)
+    console.log(i * 2)
+}`,
+        
+        java: `// Java Example with errors
+public class Example {
+    public static void main(String args[]) {
+        int x = 
+        if (x > 5) {
+            System.out.println("x is greater than 5"
+        }
+        
+        for (int i = 0; i < 10; i++ {
+            System.out.println(i);
+            System.out.println(i * 2);
+        }
+    }
+}`,
+        
+        cpp: `// C++ Example with errors
+#include <iostream>
+using namespace std;
+
+int main() {
+    int x = 
+    if (x > 5) {
+        cout << "x is greater than 5" << endl;
+    }
+    
+    for (int i = 0; i < 10; i++ {
+        cout << i << endl;
+        cout << i * 2 << endl;
+    }
+    
+    return 0
+}`,
+        
+        csharp: `// C# Example with errors
+using System;
+
+class Program {
+    static void Main() {
+        int x = 
+        if (x > 5) {
+            Console.WriteLine("x is greater than 5";
+        }
+        
+        for (int i = 0; i < 10; i++ {
+            Console.WriteLine(i);
+            Console.WriteLine(i * 2);
+        }
+    }
+}`
+    };
+
+    // Initialize line counter
+    updateLineCounter();
+
+    // Language selection
+    langButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            langButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLang = btn.dataset.lang;
+            currentLanguage.textContent = btn.textContent;
+            
+            if (exampleCode[currentLang]) {
+                codeInput.value = exampleCode[currentLang];
+                updateLineCounter();
+                const lines = codeInput.value.split('\n').length;
+                lineCount.textContent = lines;
+            }
+        });
+    });
+
+    // Update line counter on input
+    codeInput.addEventListener('input', () => {
+        updateLineCounter();
+        const lines = codeInput.value.split('\n').length;
+        lineCount.textContent = lines;
+    });
+
+    // Update line counter with proper alignment
+    function updateLineCounter() {
+        const lines = codeInput.value.split('\n');
+        let lineNumbers = '';
+        const lineHeight = 1.5;
+        
+        for (let i = 1; i <= lines.length; i++) {
+            lineNumbers += i + '\n';
+        }
+        lineCounter.textContent = lineNumbers || '1';
+        
+        lineCounter.style.lineHeight = lineHeight + 'em';
+        codeInput.style.lineHeight = lineHeight + 'em';
+    }
+
+    // Sync scroll between textarea and line counter
+    codeInput.addEventListener('scroll', () => {
+        lineCounter.scrollTop = codeInput.scrollTop;
+        lineCounter.scrollLeft = codeInput.scrollLeft;
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+        codeInput.value = '';
+        lineCount.textContent = '1';
+        updateLineCounter();
+        showEmptyState();
+    });
+
+    // Analyze button - CONNECTED TO BACKEND
+    analyzeBtn.addEventListener('click', async () => {
+        const code = codeInput.value.trim();
+
+        if (!code) {
+            alert('Please enter some code to analyze!');
+            return;
+        }
+
+        // Show loading state
+        showLoadingState();
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+        try {
+            // Send request to Django backend
+            const response = await fetch('/api/analyze/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    code: code,
+                    language: currentLang
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                currentAnalysis = data;
+                displayResults(data);
+            } else {
+                displayError(data.error || 'An error occurred during analysis');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            displayError('Failed to connect to the server. Please try again.');
+            
+            // Fallback to mock data
+            setTimeout(() => {
+                const mockResults = getMockResults(currentLang, code);
+                currentAnalysis = mockResults;
+                displayResults(mockResults);
+            }, 1000);
+        } finally {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = '<i class="fas fa-magic"></i> Analyze Code';
+        }
+    });
+
+    function showEmptyState() {
+        emptyState.style.display = 'flex';
+        loadingState.classList.remove('active');
+        resultsContainer.classList.remove('active');
+        resultsContainer.innerHTML = '';
+    }
+
+    function showLoadingState() {
+        emptyState.style.display = 'none';
+        loadingState.classList.add('active');
+        resultsContainer.classList.remove('active');
+        resultsContainer.innerHTML = '';
+    }
+
+    function displayResults(data) {
+        emptyState.style.display = 'none';
+        loadingState.classList.remove('active');
+        resultsContainer.classList.add('active');
+
+        let html = '';
+        
+        // Analysis header with summary
+        const totalErrors = data.errors ? data.errors.length : 0;
+        const totalWarnings = data.warnings ? data.warnings.length : 0;
+        const totalIssues = totalErrors + totalWarnings;
+        
+        html += `
+            <div class="analysis-header">
+                <div class="analysis-title">Analysis Results</div>
+                <div class="analysis-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-bug"></i>
+                        <span>${totalErrors} errors</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>${totalWarnings} warnings</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Summary badge
+        if (totalIssues === 0) {
+            html += `
+                <div class="summary-badge success">
+                    <i class="fas fa-check-circle"></i>
+                    No issues found! Your code looks great!
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="summary-badge ${totalErrors > 0 ? 'error' : 'warning'}">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Found ${totalErrors} error(s) and ${totalWarnings} warning(s)
+                </div>
+            `;
+        }
+
+        // Filter controls
+        html += `
+            <div class="filter-controls">
+                <button class="filter-btn active" data-filter="all">
+                    All Issues (${totalIssues})
+                </button>
+                <button class="filter-btn" data-filter="errors">
+                    Errors (${totalErrors})
+                </button>
+                <button class="filter-btn" data-filter="warnings">
+                    Warnings (${totalWarnings})
+                </button>
+            </div>
+        `;
+
+        // Display Concept Map
+        if (data.concept_map && data.concept_map.length > 0) {
+            html += createConceptMap(data.concept_map);
+        }
+        
+        html += `<div class="issues-container" id="issuesContainer">`;
+
+        // Display errors
+        if (data.errors && data.errors.length > 0) {
+            data.errors.forEach((error, index) => {
+                html += createIssueCard(error, 'error', index);
+            });
+        }
+
+        // Display warnings
+        if (data.warnings && data.warnings.length > 0) {
+            data.warnings.forEach((warning, index) => {
+                html += createIssueCard(warning, 'warning', index + (data.errors ? data.errors.length : 0));
+            });
+        }
+        
+        if (totalIssues === 0) {
+            html += `
+                <div class="issue-item warning">
+                    <div class="issue-header">
+                        <div class="issue-title">No Issues Found</div>
+                        <div class="issue-badges">
+                            <div class="issue-type warning">
+                                <i class="fas fa-check-circle"></i>
+                                SUCCESS
+                            </div>
+                        </div>
+                    </div>
+                    <div class="issue-description">
+                        Your code is clean and follows good practices. Great job!
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += `</div>`;
+
+        // Display Correction Strategies
+        if (data.correction_strategies && data.correction_strategies.length > 0 && totalIssues > 0) {
+            html += createCorrectionStrategiesSection(data.correction_strategies);
+        }
+
+        // Display corrected code
+        if (data.corrected_code && totalIssues > 0) {
+            html += createCorrectedCodeSection(data.corrected_code);
+        }
+
+        // Display suggestions
+        if (data.suggestions && data.suggestions.length > 0) {
+            html += `
+                <div class="suggestion">
+                    <div class="suggestion-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>AI Suggestions</span>
+                    </div>
+                    <div class="suggestion-content">
+                        <ul style="margin-left: 20px; color: #cbd5e1;">
+                            ${data.suggestions.map(suggestion => `<li>${escapeHtml(suggestion)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        resultsContainer.innerHTML = html;
+        
+        // CRITICAL FIX: Re-attach event listeners after HTML is inserted
+        setTimeout(() => {
+            // Attach filter button event listeners
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                // Remove existing event listeners by cloning
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                // Add click listener to new button
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const filterType = this.getAttribute('data-filter');
+                    console.log('Filter clicked:', filterType);
+                    
+                    // Don't process if already active
+                    if (this.classList.contains('active')) {
+                        return;
+                    }
+                    
+                    // Update button states
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Set and apply filter
+                    activeFilter = filterType;
+                    applyFilter();
+                });
+            });
+            
+            // Initial filter application
+            applyFilter();
+            
+            console.log('Filter buttons initialized. Active filter:', activeFilter);
+        }, 100);
+        
+        // Add event listeners to hint buttons (event delegation)
+        resultsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('hint-btn')) {
+                const issueId = e.target.getAttribute('data-issue-id');
+                const level = e.target.getAttribute('data-level');
+                if (issueId && level) {
+                    getHint(parseInt(issueId), parseInt(level), e.target);
+                }
+            }
+            
+            // Handle concept badge clicks
+            if (e.target.classList.contains('concept-badge')) {
+                const concept = e.target.textContent.split('\n')[0].trim();
+                filterByConcept(concept, e.target);
+            }
+        });
+
+        // Scroll to top of results
+        resultsContainer.scrollTop = 0;
+    }
+
+    function createConceptMap(conceptMap) {
+        let html = `
+            <div class="concept-map">
+                <h3><i class="fas fa-sitemap"></i> Concept Map - Issues by Category</h3>
+                <div class="concept-categories">
+        `;
+        
+        // Group by category
+        const categories = {};
+        conceptMap.forEach(item => {
+            if (!categories[item.category]) {
+                categories[item.category] = [];
+            }
+            categories[item.category].push(item);
+        });
+        
+        // Create category sections
+        Object.keys(categories).forEach(category => {
+            html += `
+                <div class="concept-category">
+                    <div class="category-header">${category}</div>
+                    <div class="concept-items">
+            `;
+            
+            categories[category].forEach(item => {
+                html += `
+                    <div class="concept-badge" data-concept="${item.concept}">
+                        ${escapeHtml(item.concept)}
+                        <span class="concept-count">${item.count}</span>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+        });
+        
+        html += `</div></div>`;
+        return html;
+    }
+
+    function createIssueCard(issue, type, index) {
+        const typeClass = type === 'error' ? 'error' : 'warning';
+        const icon = type === 'error' ? 'fa-times-circle' : 'fa-exclamation-triangle';
+        const severityClass = issue.severity ? `severity-${issue.severity}` : 'severity-medium';
+        const issueId = issue.id || index;
+        
+        // Build hint system
+        let hintSystem = createHintSystem(issueId);
+
+        // Build details section
+        let details = '';
+        if (issue.cause || issue.fix) {
+            details = `
+                <div class="issue-details">
+                    ${issue.cause ? `
+                        <div class="detail-row">
+                            <div class="detail-label">Cause:</div>
+                            <div class="detail-value">${escapeHtml(issue.cause)}</div>
+                        </div>
+                    ` : ''}
+                    ${issue.fix ? `
+                        <div class="detail-row">
+                            <div class="detail-label">Fix:</div>
+                            <div class="detail-value">${escapeHtml(issue.fix)}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        return `
+            <div class="issue-item ${typeClass}" data-issue-type="${type}" data-issue-index="${index}" data-category="${issue.type || ''}">
+                <div class="issue-header">
+                    <div class="issue-title">${escapeHtml(issue.title || issue.type || 'Issue')}</div>
+                    <div class="issue-badges">
+                        <div class="${severityClass} issue-severity">
+                            ${issue.severity || 'medium'}
+                        </div>
+                        <div class="issue-type ${typeClass}">
+                            <i class="fas ${icon}"></i>
+                            ${type.toUpperCase()}
+                        </div>
+                    </div>
+                </div>
+                <div class="issue-description">${escapeHtml(issue.description || issue.message || '')}</div>
+                ${details}
+                ${issue.code ? `<div class="issue-code">${escapeHtml(issue.code)}</div>` : ''}
+                ${issue.line ? `
+                    <div class="issue-line">
+                        <i class="fas fa-location-dot"></i>
+                        Line ${issue.line}${issue.column ? `, Column ${issue.column}` : ''}
+                    </div>
+                ` : ''}
+                ${hintSystem}
+            </div>
+        `;
+    }
+
+    function createHintSystem(issueId) {
+        return `
+            <div class="hint-system" data-issue-id="${issueId}">
+                <div class="hint-header">
+                    <i class="fas fa-graduation-cap"></i>
+                    Learning Hints
+                </div>
+                <div class="hint-levels">
+                    <button class="hint-btn" data-issue-id="${issueId}" data-level="1">Level 1: Gentle Nudge</button>
+                    <button class="hint-btn" data-issue-id="${issueId}" data-level="2">Level 2: Partial Clue</button>
+                    <button class="hint-btn" data-issue-id="${issueId}" data-level="3">Level 3: Full Solution</button>
+                </div>
+                <div class="hint-content" id="hint-${issueId}">
+                    Click on a hint level to reveal guidance for this issue
+                </div>
+            </div>
+        `;
+    }
+
+    function createCorrectionStrategiesSection(strategies) {
+        let html = `
+            <div class="correction-strategies">
+                <div class="strategies-header">
+                    <i class="fas fa-tools"></i>
+                    Correction Strategies
+                </div>
+        `;
+
+        strategies.forEach((strategy, index) => {
+            html += `
+                <div class="strategy-item">
+                    <div class="strategy-name">${escapeHtml(strategy.name || `Strategy ${index + 1}`)}</div>
+                    ${strategy.description ? `<div class="strategy-description">${escapeHtml(strategy.description)}</div>` : ''}
+                    ${strategy.code ? `<div class="strategy-code">${escapeHtml(strategy.code)}</div>` : ''}
+                    <div class="pros-cons">
+                        <div class="pros-list">
+                            <div class="pros-title"><i class="fas fa-check-circle"></i> Pros</div>
+                            <ul>
+                                ${(strategy.pros || []).map(pro => `<li>${escapeHtml(pro)}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="cons-list">
+                            <div class="cons-title"><i class="fas fa-times-circle"></i> Cons</div>
+                            <ul>
+                                ${(strategy.cons || []).map(con => `<li>${escapeHtml(con)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        return html;
+    }
+
+    function createCorrectedCodeSection(correctedCode) {
+        const escapedCode = escapeHtml(correctedCode);
+        return `
+            <div class="corrected-code-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <div class="corrected-code-header">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Corrected Code</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('${escapedCode.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-copy"></i>
+                        Copy Code
+                    </button>
+                </div>
+                <div class="code-block">${escapedCode}</div>
+            </div>
+        `;
+    }
+
+    function displayError(message) {
+        emptyState.style.display = 'none';
+        loadingState.classList.remove('active');
+        resultsContainer.classList.add('active');
+        
+        resultsContainer.innerHTML = `
+            <div class="issue-item error">
+                <div class="issue-header">
+                    <div class="issue-title">Analysis Failed</div>
+                    <div class="issue-type error">
+                        <i class="fas fa-times-circle"></i>
+                        ERROR
+                    </div>
+                </div>
+                <div class="issue-description">${escapeHtml(message)}</div>
+                <div class="issue-line">
+                    <i class="fas fa-info-circle"></i>
+                    Please check your internet connection and try again.
+                </div>
+            </div>
+        `;
+    }
+
+    // Filter functions - FIXED
+    function setFilter(filterType) {
+        console.log('setFilter called with:', filterType);
+        activeFilter = filterType;
+        
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-filter') === filterType) {
+                btn.classList.add('active');
+            }
+        });
+        
+        applyFilter();
+    }
+
+    function applyFilter() {
+        console.log('applyFilter called. activeFilter:', activeFilter);
+        
+        const issues = document.querySelectorAll('.issue-item');
+        console.log('Total issues found:', issues.length);
+        
+        let visibleCount = 0;
+        let hiddenCount = 0;
+        
+        issues.forEach((issue, index) => {
+            const issueType = issue.dataset.issueType;
+            
+            let shouldShow = false;
+            
+            if (activeFilter === 'all') {
+                shouldShow = true;
+            } else if (activeFilter === 'errors' && issueType === 'error') {
+                shouldShow = true;
+            } else if (activeFilter === 'warnings' && issueType === 'warning') {
+                shouldShow = true;
+            }
+            
+            if (shouldShow) {
+                issue.classList.remove('filtered');
+                visibleCount++;
+                console.log(`Showing issue ${index} (type: ${issueType})`);
+            } else {
+                issue.classList.add('filtered');
+                hiddenCount++;
+                console.log(`Hiding issue ${index} (type: ${issueType})`);
+            }
+        });
+        
+        console.log(`Filter result: ${visibleCount} visible, ${hiddenCount} hidden`);
+        
+        // If no issues visible but we have issues, show a message
+        if (visibleCount === 0 && issues.length > 0) {
+            console.log('No issues match filter. Showing message.');
+            
+            const issuesContainer = document.querySelector('.issues-container');
+            if (issuesContainer) {
+                // Remove any existing no-match message
+                const existingMessage = issuesContainer.querySelector('.no-match-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+                
+                // Create and add new message
+                const message = document.createElement('div');
+                message.className = 'issue-item warning no-match-message';
+                message.innerHTML = `
+                    <div class="issue-header">
+                        <div class="issue-title">No Issues Match Filter</div>
+                        <div class="issue-type warning">
+                            <i class="fas fa-info-circle"></i>
+                            INFO
+                        </div>
+                    </div>
+                    <div class="issue-description">
+                        No ${activeFilter} found. Try selecting "All Issues" or a different filter.
+                    </div>
+                `;
+                issuesContainer.prepend(message);
+            }
+        } else {
+            // Remove no-match message if it exists
+            const noMatchMsg = document.querySelector('.no-match-message');
+            if (noMatchMsg) {
+                noMatchMsg.remove();
+            }
+        }
+    }
+
+    function filterByConcept(concept, element) {
+        console.log('Filtering by concept:', concept);
+        const issues = document.querySelectorAll('.issue-item');
+        
+        issues.forEach(issue => {
+            const category = issue.dataset.category;
+            if (category && category.toLowerCase().includes(concept.toLowerCase())) {
+                issue.classList.remove('filtered');
+                issue.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                issue.classList.add('filtered');
+            }
+        });
+
+        // Highlight the clicked concept
+        document.querySelectorAll('.concept-badge').forEach(badge => {
+            badge.classList.remove('active');
+        });
+        element.classList.add('active');
+    }
+
+    // Hint system
+    async function getHint(issueId, level, buttonElement) {
+        console.log('Getting hint for issue:', issueId, 'level:', level);
+        
+        const hintElement = document.getElementById(`hint-${issueId}`);
+        const code = codeInput.value.trim();
+
+        if (!hintElement) {
+            console.error('Hint element not found for issue:', issueId);
+            return;
+        }
+
+        if (!code) {
+            hintElement.innerHTML = 'Please enter code first';
+            return;
+        }
+
+        // Update active hint level
+        const hintSystem = hintElement.closest('.hint-system');
+        if (hintSystem) {
+            const buttons = hintSystem.querySelectorAll('.hint-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+        }
+
+        // Show loading
+        hintElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading hint...';
+
+        try {
+            // Get CSRF token
+            const csrfToken = getCookie('csrftoken');
+            
+            const response = await fetch('/api/get_hint/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken || ''
+                },
+                body: JSON.stringify({
+                    code: code,
+                    issue_id: issueId,
+                    level: level,
+                    language: currentLang
+                })
+            });
+
+            console.log('Hint response status:', response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Hint response data:', data);
+                
+                if (data.hint) {
+                    hintElement.innerHTML = escapeHtml(data.hint);
+                    activeHintLevels[issueId] = level;
+                } else {
+                    hintElement.innerHTML = 'No hint available for this issue.';
+                }
+            } else {
+                let errorMsg = `Server error: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.error || errorMsg;
+                } catch (e) {
+                    // Ignore JSON parse error
+                }
+                console.error('Hint server error:', errorMsg);
+                hintElement.innerHTML = `Error: ${errorMsg}`;
+            }
+        } catch (error) {
+            console.error('Error getting hint:', error);
+            hintElement.innerHTML = 'Network error. Using mock hint.';
+            
+            // Fallback to mock hints
+            setTimeout(() => {
+                const mockHints = {
+                    1: 'Try looking at the syntax carefully. Check for missing punctuation.',
+                    2: 'The issue might be related to missing or incorrect syntax elements in this language.',
+                    3: 'Consider adding the missing syntax element at the indicated location. For example, add a colon at the end of the line.'
+                };
+                hintElement.innerHTML = mockHints[level] || 'Try examining the code structure carefully.';
+            }, 500);
+        }
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Helper function to copy to clipboard
+    window.copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = event.target.closest('.copy-btn');
+            if (btn) {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            }
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy code to clipboard');
+        });
+    };
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Mock results for demonstration (fallback)
+    function getMockResults(language, code) {
+        return {
+            analysis_summary: {
+                total_errors: 4,
+                total_warnings: 1,
+                overall_severity: "high",
+                language: language,
+                concepts_covered: ['Syntax', 'Indentation', 'Missing Operators']
+            },
+            concept_map: [
+                { category: 'syntax', concept: 'Indentation', count: 3, issues: [0, 1, 2] },
+                { category: 'syntax', concept: 'Missing Colon', count: 2, issues: [0, 3] },
+                { category: 'syntax', concept: 'Missing Parentheses', count: 1, issues: [1] }
+            ],
+            errors: [
+                {
+                    id: 1,
+                    type: 'SyntaxError',
+                    title: 'Missing colon in function definition',
+                    description: 'Function definitions require a colon at the end of the line.',
+                    cause: 'This is a syntax error in Python where function definitions must end with a colon.',
+                    fix: 'Add a colon (:) at the end of the function definition line.',
+                    line: 2,
+                    column: 15,
+                    code: 'def greet(name)',
+                    severity: 'high',
+                    hints: {
+                        level1: 'Look at how Python defines functions.',
+                        level2: 'Function definitions need proper punctuation at the end.',
+                        level3: 'Add a colon at the end: def greet(name):'
+                    }
+                },
+                {
+                    id: 2,
+                    type: 'SyntaxError',
+                    title: 'Missing parentheses in print statement',
+                    description: 'In Python 3, print is a function and requires parentheses.',
+                    cause: 'This code uses Python 2 style print statement without parentheses.',
+                    fix: 'Wrap the print argument in parentheses: print("Hello, " + name)',
+                    line: 3,
+                    column: 1,
+                    code: 'print "Hello, " + name',
+                    severity: 'high',
+                    hints: {
+                        level1: 'Check the print statement syntax.',
+                        level2: 'In Python 3, print requires parentheses.',
+                        level3: 'Change to: print("Hello, " + name)'
+                    }
+                }
+            ],
+            warnings: [
+                {
+                    id: 3,
+                    type: 'IndentationWarning',
+                    title: 'Inconsistent indentation',
+                    description: 'Mixed indentation can cause errors. Use either spaces or tabs consistently.',
+                    cause: 'The code uses a mix of spaces and tabs which can cause indentation errors.',
+                    fix: 'Convert all indentation to 4 spaces (Python standard).',
+                    line: 10,
+                    code: '    print(i)  # inconsistent indentation',
+                    severity: 'medium',
+                    hints: {
+                        level1: 'Check the indentation in the loop.',
+                        level2: 'Python requires consistent indentation.',
+                        level3: 'Use 4 spaces for all indentation.'
+                    }
+                }
+            ],
+            correction_strategies: [
+                {
+                    name: 'Fix indentation with 4 spaces',
+                    description: 'Standardize all indentation to use 4 spaces.',
+                    code: 'def greet(name):\n    print("Hello, " + name)',
+                    pros: ['PEP 8 compliant', 'Most common convention', 'Improves readability'],
+                    cons: ['Need to ensure entire file follows same convention']
+                },
+                {
+                    name: 'Use f-strings for string formatting',
+                    description: 'Modern Python string formatting approach.',
+                    code: 'def greet(name):\n    print(f"Hello, {name}")',
+                    pros: ['More readable', 'Better performance', 'Modern syntax'],
+                    cons: ['Only works in Python 3.6+', 'Requires learning new syntax']
+                }
+            ],
+            corrected_code: `# Python Example corrected
+def greet(name):
+    print("Hello, " + name)
+
+x = 0
+if x > 5:
+    print("x is greater than 5")
+
+for i in range(10):
+    print(i)  # consistent indentation
+    print(i * 2)`,
+            suggestions: [
+                "Use f-strings for string formatting in Python 3.6+",
+                "Add type hints for better code documentation",
+                "Consider adding docstrings to functions"
+            ],
+            best_practices: [
+                "Use consistent indentation (4 spaces recommended)",
+                "Follow PEP 8 style guide",
+                "Add comments for complex logic"
+            ]
+        };
+    }
+
+    // Initialize
+    showEmptyState();
+    updateLineCounter();
+
+    // Make functions globally available
+    window.getHint = getHint;
+    window.setFilter = setFilter;
+    window.filterByConcept = filterByConcept;
+    window.copyToClipboard = copyToClipboard;
+
+    // Initialize on window load
+    window.addEventListener('load', () => {
+        updateLineCounter();
+        
+        console.log('CodeTutor AI initialized');
+        console.log('Hint endpoint: /api/get_hint/');
+        console.log('Analyze endpoint: /api/analyze/');
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        updateLineCounter();
+    });
+</script>
+</body>
+</html>

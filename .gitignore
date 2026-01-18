@@ -1,0 +1,96 @@
+ 
+echo # Virtual Environment > .gitignore
+echo env/ >> .gitignore
+echo .venv/ >> .gitignore
+echo __pycache__/ >> .gitignore
+echo *.pyc >> .gitignore
+echo .env >> .gitignore
+echo /env/ >> .gitignore
+
+
+
+    # ========================
+    # ENV & SECRETS (CRITICAL)
+    # ========================
+    .env
+    .env.*
+    *.key
+
+    # ========================# Virtual environment
+    env/
+    venv/
+
+    # Python
+    __pycache__/
+    *.pyc
+    *.pyo
+    *.pyd
+
+    # Environment variables
+    .env
+
+    # Django
+    db.sqlite3
+    staticfiles/
+    media/
+
+    # OS
+    .DS_Store
+    Thumbs.db
+
+    # PYTHON / DJANGO
+    # ========================
+    __pycache__/
+    *.py[cod]
+    *$py.class
+    *.log
+    *.sqlite3
+    db.sqlite3
+
+    # Django
+    media/
+    staticfiles/
+    *.pot
+
+    # Virtual environments
+    env/
+    venv/
+    ENV/
+    .venv/
+
+    # ========================
+    # NODE / PLAYWRIGHT
+    # ========================
+    node_modules/
+    .ms-playwright/
+    playwright/.cache/
+
+    # ========================
+    # PDF / REPORT FILES
+    # ========================
+    *.pdf
+
+    # ========================
+    # BUILD / CACHE
+    # ========================
+    .cache/
+    .dist/
+    build/
+    dist/
+
+    # ========================
+    # IDE / OS FILES
+    # ========================
+    .vscode/
+    .idea/
+    .DS_Store
+    Thumbs.db
+
+    # ========================
+    # GIT
+    # ========================
+    .gitconfig
+env/ 
+__pycache__/ 
+.env 
+*.pyc 
