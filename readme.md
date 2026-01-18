@@ -431,7 +431,7 @@ This project is dedicated to **every beginner programmer** who's ever been frust
   <h3>📧 Contact & Support</h3>
   <p>
     <strong>Developer:</strong>RITHIK<br>
-    <strong>Email:</strong> rithik.devpro@gmail.com<br>
+    <strong>Email:</strong> <a href="mailto:rithik.devpro@gmail.com">rithik.devpro@gmail.com</a><br>
     <strong>GitHub:</strong> <a href="https://github.com/rithik-dev31">@rithik-dev31</a>
   </p>
   
